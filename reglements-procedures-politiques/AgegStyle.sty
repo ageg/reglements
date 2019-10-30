@@ -1,0 +1,273 @@
+\ProvidesPackage{AgegStyle}
+\usepackage{amsmath}						% For maths
+\usepackage{array}							% For tables
+\usepackage[francais]{babel}				% For French Options
+\usepackage{color}							% For color outputs
+\usepackage{enumerate}						% For enumeration options
+\usepackage[T1]{fontenc}					% Font Encoding, pour moins de bêtises
+\usepackage{forloop}						% For For Loops
+\usepackage[margin=0.5in]{geometry}			% Set thin margins
+\usepackage{graphicx}						% Pour les images
+\usepackage{ifpdf}							% For LaTeX vs PDFLaTeX checking
+\usepackage[utf8]{inputenc}					% Encodage UTF-8
+\usepackage{intcalc}						% For integer computations
+\usepackage{lmodern}						% Fonts, otherwise crappy on faildows
+\usepackage{soulutf8}						% For Highlights
+\usepackage{titlesec}						% For title styling
+\usepackage{tocloft}						% For TOC Management
+\usepackage{ulem}							% For Striketrough
+\usepackage{xparse}							% For more versatile functions
+\usepackage{etoc}
+% 
+\ifpdf
+	% PDFLaTeX needs support for EPS graphics
+	\usepackage{epstopdf}
+	\epstopdfsetup{update}
+	% PDFLaTeX, can support HyperRef
+	\usepackage{hyperref}					% URLs dans la TOC
+	\usepackage{pageslts}					% For Page Numbers, it has to be include after hyperref otherwise compilation failed for some reason on overleaf.
+    \hypersetup{
+		colorlinks,
+		citecolor=black,
+		filecolor=black,
+		linkcolor=black,
+		urlcolor=black
+	}
+\else
+	% LaTeX No need for EPSToPDF
+	% LaTeX Hyperref fails for some odd reason...
+\fi
+
+\usepackage{etoolbox}						% For boolean logic; has to be loaded after pageslts
+
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{0}
+
+%%% Explicitely Show Abrogated Bylaws
+\newbool{ShowAbrogated}
+% \booltrue{ShowAbrogated}
+\boolfalse{ShowAbrogated}
+
+%%%
+%	Table Of Contents Style
+%%%
+\renewcommand\cftbeforechapskip{.1em}
+
+%%%
+%	Remapping des fonctions de layout
+%%%
+% \titleformat{command}[shape]{format}{label}{sep}{before}[after]
+\titleformat{\chapter}{\normalfont\Large\bfseries}{\thechapter}{\z@}{}
+\makeatletter
+\renewcommand\section{
+	\@startsection{section}{1}{\z@}%
+	{-3.5ex\@plus -1ex \@minus -.2ex}%
+	{1.5ex \@plus .2ex}%
+	{\normalfont\large\bfseries}*
+}
+\renewcommand\subsection{
+	\@startsection{subsection}{2}{3.25ex}%
+	{-1.625ex\@plus -1ex \@minus -.2ex}%
+	{.75ex \@plus .2ex}%
+	{\normalfont\normalsize\bfseries}*
+}
+\renewcommand\subsubsection{
+	\@startsection{subsubsection}{3}{6.5ex}%
+	{-1.625ex\@plus -1ex \@minus -.2ex}%
+	{.75ex \@plus .2ex}%
+	{\normalfont\normalsize\bfseries}*
+}
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+	{\z@}%3.25ex \@plus1ex \@minus.2ex}% beforeskip: Absolute value = skip to leave above the heading. If negative, then paragraph indent of text following heading is suppressed.
+	{-1em}% afterskip : If positive, then skip to leave below heading, else negative of skip to leave to right of run-in heading.
+	{\normalfont\normalsize\bfseries}* % style
+}
+\renewcommand\subparagraph{\@startsection{subparagraph}{5}{3.25ex}%
+	{\z@}%
+	{-1em}%
+	{\normalfont\normalsize\bfseries}*
+}
+
+\newcounter{@agegPage}
+\newcommand{\agegskip}{
+% test if we need to skip 4 pages
+	\ifthenelse{\intcalcMod{\theCurrentPage}{4}<2}
+	{
+		% 0 or 1 jump to do, handle the special cases
+		\ifthenelse{\intcalcMod{\theCurrentPage}{4}=0}{
+			% Mod =0 -> 1 Page to skip
+			\agegskipstring
+		}
+		{} % Mod=1 -> Nothing to do
+	}
+	{
+		% Skip all the pages required to get to next sheet on 2/page 2-sided print
+		\forloop{@agegPage}{\intcalcMod{\theCurrentPage}{4}}{\value{@agegPage}<5}{
+		%\forloop{counter}{initial value}{condition}{code}
+			\agegskipstring
+		}
+	}
+}
+\newcommand{\agegskipstring}{
+	\vspace*{\fill}\centerline{\textsl{Page laissée intentionnellement blanche pour révision future.}}\vspace*{\fill}
+	\clearpage
+}
+\makeatother % Fin de l'edition des commandes
+
+%%%
+%  Table des matières individuels
+%%%
+
+\newcommand{\listproceduresname}{Table des matières} 
+	\newlistof{myprocedure}{pro}{\listproceduresname} 
+	
+		
+\newcommand{\listpolitiquename}{Table des matières} 
+	\newlistof{mypolitique}{pol}{\listpolitiquename} 
+	
+
+%%%
+%	Layout des reglements
+%%%
+\newcounter{reglement}
+\newcounter{addenda}[reglement]
+\newcounter{partie}[reglement]
+\newcounter{article}[partie]
+\newcounter{sousarticle}[article]
+\newcounter{alinea}[article]
+\newcounter{sousalinea}[alinea]
+\newcommand{\reglement}[1]{
+	\agegskip
+	\stepcounter{reglement}
+	\chapter*{Réglement~\thereglement~: #1}
+	\addcontentsline{toc}{chapter}{Réglement~\thereglement~: #1}
+}
+\newcommand{\politique}[1]{
+	\agegskip
+	\stepcounter{reglement}
+	\chapter*{Politique~\thereglement~: #1}
+	\addcontentsline{pol}{chapter}{Politique~\thereglement~: #1}
+}
+\newcommand{\procedure}[1]{
+	\agegskip
+	\stepcounter{reglement}
+	\chapter*{Procédure~\thereglement~: #1}
+	\addcontentsline{pro}{chapter}{Procédure~\thereglement~: #1}
+}
+
+
+\newcommand{\reglementAbroge}{
+	\stepcounter{reglement}
+	\ifbool{ShowAbrogated}{
+		\agegskip
+		\chapter*{Règlement~\thereglement~ - Règlement abrogé}
+		\newpage
+    }{}
+}
+\newcommand{\politiqueAbroge}{
+	\stepcounter{reglement}
+	\ifbool{ShowAbrogated}{
+		\agegskip
+		\chapter*{Politique~\thereglement~ - Politique abrogé}
+		\newpage
+    }{}
+}
+\newcommand{\procedureAbroge}{
+	\stepcounter{reglement}
+	\ifbool{ShowAbrogated}{
+		\agegskip
+		\chapter*{Procédure~\thereglement~ - Procédure abrogé}
+		\newpage
+    }{}
+}
+\newcommand{\addenda}[1]{
+	\stepcounter{addenda}
+	\chapter*{Addenda~\thereglement-\theaddenda.~#1}
+	\addcontentsline{toc}{chapter}{Addenda~\thereglement-\theaddenda.~#1}
+}
+\newcommand{\partie}[1]{
+	\stepcounter{partie}
+	\section{Partie~\Roman{partie}~: #1}
+	\addcontentsline{toc}{section}{#1}
+}
+\newcommand{\article}[1]{
+	\stepcounter{article}
+	\subsection{Art. \arabic{partie}.\arabic{article}~: #1}
+	\addcontentsline{toc}{subsection}{#1}
+}
+\newcommand{\sousarticle}[1]{
+	\stepcounter{sousarticle}
+	\subsubsection{Art. \arabic{partie}.\arabic{article}.\arabic{sousarticle}~: #1}
+	\setcounter{alinea}{0}
+}
+\newcommand{\alinea}[1]{
+	\stepcounter{alinea}
+	\paragraph{\alph{alinea})}~#1
+}
+\newcommand{\sousalinea}[1]{
+	\stepcounter{sousalinea}
+	\subparagraph{\roman{sousalinea}}~#1
+}
+\newcommand{\adoption}[2]{
+	\vspace{1em}
+	\par{\textbf{Modifications adoptées en CA le #1, entérinées en AG le #2.}}
+}
+\newcommand{\adoptionPO}[1]{
+	\vspace{1em}
+	\par{\textbf{Modifications adoptées en CA le #1.}}
+}
+\newcommand{\preambule}[1]{
+	\textbf{Préambule~:}
+	\textit{#1}
+}
+\newcommand{\valeurs}[8]{
+	\begin{tabular}[c]{m{80px}|m{320px}}
+		\hline
+		#1 & #2 \\ \hline
+		#3 & #4 \\ \hline
+		#5 & #6 \\ \hline
+		#7 & #8 \\ \hline
+	\end{tabular}
+}
+
+% Change tracking
+\newcommand{\add}[1]{\textcolor{red}{#1}}
+
+\newcommand{\remove}[1]{\textcolor{red}{\st{#1}}}
+
+\newcommand{\replace}[2]{\remove{#1}~\add{#2}}
+
+%%% Formatting Equations display
+\numberwithin{equation}{reglement}
+
+%%%
+% Layout de rapport
+%%%
+% Annexe
+\newcounter{annexe}
+\NewDocumentCommand{\annexe}{mo}{
+	\clearpage
+	\renewcommand{\theannexe}{\Alph{annexe}}
+	\refstepcounter{annexe}\IfNoValueTF{#2}{}{\label{anx:#2}}
+	\addcontentsline{toc}{chapter}{\theannexe \hspace{2em} #1}
+	\vspace*{\fill}
+	\begin{center}
+		\huge{ Annexe~\theannexe\\
+		#1}
+	\end{center}
+	\vspace{\fill}
+	\clearpage
+}
+% REGEXes to clean up changes once approved:
+% \replace
+% Search for: \\replace\{([\w\d\s\'\’\,\.\-\(\)]*)\}\{([\w\d\s\'\’\,\.\-\(\)\\]*)\}
+% Replace with:\2
+%
+% \add
+% Search for: \\add\{([\w\d\s\'\’\,\.\-\(\)]*)\}
+% Search for (secondary): \\add\{(\\(?:(?:sous)?alinea|(?:sous)?article)\{[\w\d\s\'\’\,\.\-\(\)]*\})\}
+% Replace with: \1
+%
+% \remove
+% Search for: \\remove\{([\w\d\s\'\’\,\.\+\~\-\(\)\\\/\$]*)\}
+% Replace with: (Nothing)
