@@ -131,8 +131,7 @@
 %%%
 \newcounter{reglement}
 \newcounter{addenda}[reglement]
-\newcounter{section}[reglement]
-\newcounter{partie}[section]
+\newcounter{partie}[reglement]
 \newcounter{article}[partie]
 \newcounter{sousarticle}[article]
 \newcounter{alinea}[article]
@@ -140,7 +139,7 @@
 \newcommand{\reglement}[1]{
 	\agegskip
 	\stepcounter{reglement}
-	\chapter*{Réglement~\thereglement~: #1}
+	\chapter*{Règlement~\thereglement~: #1}
 	\addcontentsline{toc}{chapter}{Réglement~\thereglement~: #1}
 }
 \newcommand{\politique}[1]{
@@ -185,11 +184,6 @@
 	\stepcounter{addenda}
 	\chapter*{Addenda~\thereglement-\theaddenda.~#1}
 	\addcontentsline{toc}{chapter}{Addenda~\thereglement-\theaddenda.~#1}
-}
-\newcommand{\section}[1]{
-    \section{Réglement~\Roman{partie}~: #1}
-	\setcounte{\hline}
-	
 }
 \newcommand{\partie}[1]{
 	\stepcounter{partie}
