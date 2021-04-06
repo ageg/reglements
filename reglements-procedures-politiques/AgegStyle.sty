@@ -57,14 +57,15 @@
 %	Remapping des fonctions de layout
 %%%
 % \titleformat{command}[shape]{format}{label}{sep}{before}[after]
-\titleformat{\chapter}{\normalfont\Large\bfseries}{\thechapter}{\z@}{}
+\titleformat{\chapter}{\normalfont\Large\bfseries}{Partie \thechapter~\setcounter{article}{0} \setcounter{alinea}{0}}{\z@}{}
 \makeatletter
 \renewcommand\section{
 	\@startsection{section}{1}{\z@}%
 	{-3.5ex\@plus -1ex \@minus -.2ex}%
 	{1.5ex \@plus .2ex}%
-	{\normalfont\large\bfseries}*
+	{\setcounter{article}{0} \setcounter{alinea}{0} \normalfont\large\bfseries}
 }
+
 \renewcommand\subsection{
 	\@startsection{subsection}{2}{3.25ex}%
 	{-1.625ex\@plus -1ex \@minus -.2ex}%
@@ -88,30 +89,6 @@
 	{\normalfont\normalsize\bfseries}*
 }
 
-\newcounter{@agegPage}
-\newcommand{\agegskip}{
-% test if we need to skip 4 pages
-	\ifthenelse{\intcalcMod{\theCurrentPage}{4}<2}
-	{
-		% 0 or 1 jump to do, handle the special cases
-		\ifthenelse{\intcalcMod{\theCurrentPage}{4}=0}{
-			% Mod =0 -> 1 Page to skip
-			\agegskipstring
-		}
-		{} % Mod=1 -> Nothing to do
-	}
-	{
-		% Skip all the pages required to get to next sheet on 2/page 2-sided print
-		\forloop{@agegPage}{\intcalcMod{\theCurrentPage}{4}}{\value{@agegPage}<5}{
-		%\forloop{counter}{initial value}{condition}{code}
-			\agegskipstring
-		}
-	}
-}
-\newcommand{\agegskipstring}{
-	\vspace*{\fill}\centerline{\textsl{Page laissée intentionnellement blanche pour révision future.}}\vspace*{\fill}
-	\clearpage
-}
 \makeatother % Fin de l'edition des commandes
 
 %%%
@@ -136,68 +113,19 @@
 \newcounter{sousarticle}[article]
 \newcounter{alinea}[article]
 \newcounter{sousalinea}[alinea]
-\newcommand{\reglement}[1]{
-	\agegskip
-	\stepcounter{reglement}
-	\chapter*{Règlement~\thereglement~: #1}
-	\addcontentsline{toc}{chapter}{Réglement~\thereglement~: #1}
-}
-\newcommand{\politique}[1]{
-	\agegskip
-	\stepcounter{reglement}
-	\chapter*{Politique~\thereglement~: #1}
-	\addcontentsline{pol}{chapter}{Politique~\thereglement~: #1}
-}
-\newcommand{\procedure}[1]{
-	\agegskip
-	\stepcounter{reglement}
-	\chapter*{Procédure~\thereglement~: #1}
-	\addcontentsline{pro}{chapter}{Procédure~\thereglement~: #1}
-}
 
 
-\newcommand{\reglementAbroge}{
-	\stepcounter{reglement}
-	\ifbool{ShowAbrogated}{
-		\agegskip
-		\chapter*{Règlement~\thereglement~ - Règlement abrogé}
-		\newpage
-    }{}
-}
-\newcommand{\politiqueAbroge}{
-	\stepcounter{reglement}
-	\ifbool{ShowAbrogated}{
-		\agegskip
-		\chapter*{Politique~\thereglement~ - Politique abrogé}
-		\newpage
-    }{}
-}
-\newcommand{\procedureAbroge}{
-	\stepcounter{reglement}
-	\ifbool{ShowAbrogated}{
-		\agegskip
-		\chapter*{Procédure~\thereglement~ - Procédure abrogé}
-		\newpage
-    }{}
-}
-\newcommand{\addenda}[1]{
-	\stepcounter{addenda}
-	\chapter*{Addenda~\thereglement-\theaddenda.~#1}
-	\addcontentsline{toc}{chapter}{Addenda~\thereglement-\theaddenda.~#1}
-}
-\newcommand{\partie}[1]{
-	\stepcounter{partie}
-	\section{Partie~\Roman{partie}~: #1}
-	\addcontentsline{toc}{section}{#1}
-}
+
 \newcommand{\article}[1]{
 	\stepcounter{article}
-	\subsection{Art. \arabic{partie}.\arabic{article}~: #1}
-	\addcontentsline{toc}{subsection}{#1}
+	\subsection{Art. \arabic{chapter}.\arabic{article}~: #1}
+	\addcontentsline{toc}{subsubsection}{#1}
+	\setcounter{sousarticle}{0}
+	\setcounter{alinea}{0}
 }
 \newcommand{\sousarticle}[1]{
 	\stepcounter{sousarticle}
-	\subsubsection{Art. \arabic{partie}.\arabic{article}.\arabic{sousarticle}~: #1}
+	\subsubsection{Art. \arabic{chapter}.\arabic{article}.\arabic{sousarticle}~: #1}
 	\setcounter{alinea}{0}
 }
 \newcommand{\alinea}[1]{
@@ -206,7 +134,7 @@
 }
 \newcommand{\sousalinea}[1]{
 	\stepcounter{sousalinea}
-	\subparagraph{\roman{sousalinea}}~#1
+	\subparagraph{\arabic{sousalinea}.}~#1
 }
 \newcommand{\adoption}[2]{
 	\vspace{1em}
